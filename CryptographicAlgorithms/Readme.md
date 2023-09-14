@@ -16,3 +16,6 @@ non-invertible <br>
 # Symmetric Key Crpytographic Algorithms <br>
 DES <br>
 AES <br>
+IDEA <br>
+Blowfish <br>
+RC4/5 <br>
