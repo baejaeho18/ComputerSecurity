@@ -7,6 +7,7 @@ Split and Combine <br>
  <br>
 Diffusion & Confusion & Rounds <br>
  <br>
+ 
 # Feistel Cipher
 self-invertible <br>
 invertible <br>
