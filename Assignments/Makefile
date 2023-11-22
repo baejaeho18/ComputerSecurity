@@ -13,7 +13,7 @@ $(CLNT_TARGET): $(CLIENT)
 	$(CC) $(CFLAGS) -o $@ $^ -lpthread
 
 run: $(SERV_TARGET) $(CLNT_TARGET)
-	./$(CLNT_TARGET) 9690 & ./$(SERV_TARGET) 9690
+	./$(CLNT_TARGET) 203.252.112.24 9690 Alice & ./$(SERV_TARGET) 9690
 
 clean:
 	rm -f $(SERV_TARGET) $(CLNT_TARGET)
