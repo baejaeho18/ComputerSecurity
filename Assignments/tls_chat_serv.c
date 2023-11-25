@@ -10,6 +10,7 @@
 
 #define BUF_SIZE 100
 #define NAME_SIZE 20
+#define FILE_NAME_SIZE 20
 #define MAX_CLIENTS 10
 #define CERT_FILE "server.crt"
 #define KEY_FILE "server.key"
@@ -48,7 +49,6 @@ int main(int argc, char *argv[])
     ctx = SSL_CTX_new(SSLv23_server_method());
     if (ctx == NULL)
         error_handling("SSL_CTX_new() error");
-
 	// 인증서와 개인 키 로딩
     if (SSL_CTX_use_certificate_file(ctx, CERT_FILE, SSL_FILETYPE_PEM) <= 0 ||
         SSL_CTX_use_PrivateKey_file(ctx, KEY_FILE, SSL_FILETYPE_PEM) <= 0)
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
     clnt_addr_size = sizeof(clnt_addr);
 
-    while (1) 
+    while (1)
 	{
         int clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_addr, &clnt_addr_size);
         if (clnt_sock == -1) 
@@ -104,6 +104,11 @@ int main(int argc, char *argv[])
         pthread_t client_thread;
         pthread_create(&client_thread, NULL, handle_client, (void *)client_info);
         pthread_detach(client_thread);  // 스레드가 종료 시 자동으로 해제
+
+		char input;
+        scanf("%c", &input);
+        if (input == 'q' || input == 'Q')
+            break;
     }
 
     // SSL 및 서버 소켓 종료
@@ -131,7 +136,7 @@ void *handle_client(void *arg)
 			send_to_all(client_msg, clnt_sock);
 	}
 
-    // 해당 클라이언트의 정보를 초기화하고 소켓 및 SSL 자원을 해제
+    // 클라이언트의 정보 초기화 및 자원 해제
     pthread_mutex_lock(&mutex);
 	for (i = 0; i < client_cnt; i++)   // remove disconnected client
 	{
@@ -151,7 +156,6 @@ void *handle_client(void *arg)
     SSL_shutdown(ssl);
     SSL_free(ssl);
     close(clnt_sock);
-    // 클라이언트 정보를 담은 구조체를 해제
     free(client_info);  
 
     return NULL;
@@ -170,11 +174,10 @@ void send_to_all(char *message, int sender_self_index)
 void send_file_to_all(const char *file_msg, int sender_self_index) 
 {
     // 파일 정보에서 파일 이름과 크기 추출
-    char file_name[NAME_SIZE];
+    char file_name[FILE_NAME_SIZE];
     long file_size;
-    sscanf(file_msg + 11, "%s(%ld)", file_name, &file_size);
+    sscanf(file_msg + 11, "%[^(](%ld)", file_name, &file_size);
 
-	printf("%s", file_name);
     // 파일 데이터 수신
 	file_size++;
     char file_buffer[file_size];
@@ -182,17 +185,6 @@ void send_file_to_all(const char *file_msg, int sender_self_index)
         if (clients[i].clnt_sock == sender_self_index)
             if (SSL_read(clients[i].ssl, file_buffer, file_size) <= 0)
         		error_handling("SSL_read() error");
-
-    // 파일 저장 (예: 현재 디렉터리에 저장)
-    FILE *file = fopen(file_name, "wb");
-    if (file == NULL) 
-    {
-        fprintf(stderr, "Error opening file for writing: %s\n", file_name);
-        return;
-    }
-    fwrite(file_buffer, 1, file_size, file);
-    fclose(file);
-
     printf("File received");
 
     // 모든 클라이언트에게 파일 전송 메시지 전송
@@ -204,11 +196,10 @@ void send_file_to_all(const char *file_msg, int sender_self_index)
 	for (int i = 0; i < client_cnt; ++i)
         if (clients[i].clnt_sock != 0 && clients[i].clnt_sock != sender_self_index)
             SSL_write(clients[i].ssl, file_buffer, file_size);
-
 	
-    char broadcast_msg[BUF_SIZE];
-    snprintf(broadcast_msg, sizeof(broadcast_msg), "file_share end");
-    send_to_all(broadcast_msg, sender_self_index);
+    // char broadcast_msg[BUF_SIZE];
+    // snprintf(broadcast_msg, sizeof(broadcast_msg), "file_share end");
+    // send_to_all(broadcast_msg, sender_self_index);
 }
 
 void error_handling(char *msg) 

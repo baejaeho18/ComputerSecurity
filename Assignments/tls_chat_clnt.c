@@ -11,8 +11,6 @@
 #define NAME_SIZE 20
 #define FILE_NAME_SIZE 25
 
-void error_handling(char *msg);
-
 char name[NAME_SIZE] = "[DEFAULT]";
 SSL *ssl;
 SSL_CTX *ctx;
@@ -22,6 +20,7 @@ void *send_msg();
 void *recv_msg();
 void send_file(const char *file_name);
 void recv_file(SSL *ssl, const char *file_name, long file_size);
+void error_handling(char *msg);
 
 int main(int argc, char *argv[]) 
 {
@@ -107,34 +106,6 @@ void *send_msg()
     return NULL;
 }
 
-void *recv_msg() 
-{
-    char name_msg[NAME_SIZE + BUF_SIZE];
-    while (1) 
-	{
-        // TLS로 암호화된 데이터 수신
-        int str_len = SSL_read(ssl, name_msg, sizeof(name_msg) - 1);
-        if (str_len <= 0)
-            error_handling("SSL_read() error");
-        name_msg[str_len] = 0;
-
-        if (strncmp(name_msg, "file_shared:", 12) == 0) 
-        {
-            // 파일 이름 및 크기 추출
-            char *file_info = name_msg + 11;
-            char file_name[FILE_NAME_SIZE];
-            long file_size;
-            sscanf(file_info, "%s(%ld)", file_name, &file_size);
-
-            // 파일 수신을 위한 처리 함수 호출
-            recv_file(ssl, file_name, file_size + 1);
-        }
-
-    	fputs(name_msg, stdout);
-    }
-    return NULL;
-}
-
 void send_file(const char *file_name) 
 {
     FILE *file = fopen(file_name, "rb");
@@ -151,7 +122,7 @@ void send_file(const char *file_name)
     char *file_buffer = (char *)malloc(file_size);
     fread(file_buffer, 1, file_size, file);
 
-    // 파일 이름과 크기를 서버로 메시지 전송
+    // "파일 이름(크기)"를 서버에 메시지 전송
     char file_info[BUF_SIZE];
     snprintf(file_info, sizeof(file_info), "file_share:%s(%ld)", file_name, file_size);
     if (SSL_write(ssl, file_info, strlen(file_info)) <= 0)
@@ -163,6 +134,34 @@ void send_file(const char *file_name)
     // 메모리와 파일 자원 해제
     free(file_buffer);
     fclose(file);
+}
+
+void *recv_msg() 
+{
+    char serv_msg[NAME_SIZE + BUF_SIZE];
+    while (1) 
+	{
+        // TLS로 암호화된 데이터 수신
+        int str_len = SSL_read(ssl, serv_msg, sizeof(serv_msg) - 1);
+        if (str_len <= 0)
+            error_handling("SSL_read() error");
+        serv_msg[str_len] = 0;
+
+        if (strncmp(serv_msg, "file_shared:", 12) == 0) 
+        {
+            // 파일 이름 및 크기 추출
+            char *file_msg = serv_msg + 12;
+            char file_name[FILE_NAME_SIZE];
+            long file_size;
+            sscanf(file_msg, "%[^(](%ld)", file_name, &file_size);
+			strcat(file_name, name);
+            // 파일 수신을 위한 처리 함수 호출
+            recv_file(ssl, file_name, file_size + 1);
+        }
+
+    	fputs(serv_msg, stdout);
+    }
+    return NULL;
 }
 
 void recv_file(SSL *ssl, const char *file_name, long file_size) 
@@ -177,15 +176,12 @@ void recv_file(SSL *ssl, const char *file_name, long file_size)
     char file_buffer[BUF_SIZE];
     long total_received = 0;
 
-    // 파일 데이터를 수신하고 파일에 쓰기
+    // 파일 데이터를 수신 후, 파일에 쓰기
     while (total_received < file_size) 
     {
         int bytes_received = SSL_read(ssl, file_buffer, sizeof(file_buffer));
         if (bytes_received <= 0) 
-        {
             error_handling("Error receiving file data");
-            break;
-        }
 
         fwrite(file_buffer, 1, bytes_received, file);
         total_received += bytes_received;
