@@ -10,7 +10,7 @@
 
 #define BUF_SIZE 100
 #define NAME_SIZE 20
-#define MAX_CLIENTS 3
+#define MAX_CLIENTS 10
 #define CERT_FILE "server.crt"
 #define KEY_FILE "server.key"
 
@@ -176,6 +176,7 @@ void send_file_to_all(const char *file_msg, int sender_self_index)
 
 	printf("%s", file_name);
     // 파일 데이터 수신
+	file_size++;
     char file_buffer[file_size];
 	for (int i = 0; i < client_cnt; ++i)
         if (clients[i].clnt_sock == sender_self_index)

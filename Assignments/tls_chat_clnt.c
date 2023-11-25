@@ -83,6 +83,7 @@ void *send_msg()
         {
             // 파일 이름 추출
             char *file_name = msg + strlen(cmd);
+			file_name = strndup(file_name, strlen(file_name) - 1);
             // 파일 전송 함수 호출
             send_file(file_name);
         }
@@ -126,7 +127,7 @@ void *recv_msg()
             sscanf(file_info, "%s(%ld)", file_name, &file_size);
 
             // 파일 수신을 위한 처리 함수 호출
-            recv_file(ssl, file_name, file_size);
+            recv_file(ssl, file_name, file_size + 1);
         }
 
     	fputs(name_msg, stdout);
@@ -150,7 +151,7 @@ void send_file(const char *file_name)
     char *file_buffer = (char *)malloc(file_size);
     fread(file_buffer, 1, file_size, file);
 
-    // 파일 이름과 크기를 서버로 전송
+    // 파일 이름과 크기를 서버로 메시지 전송
     char file_info[BUF_SIZE];
     snprintf(file_info, sizeof(file_info), "file_share:%s(%ld)", file_name, file_size);
     if (SSL_write(ssl, file_info, strlen(file_info)) <= 0)
