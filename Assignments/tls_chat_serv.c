@@ -10,7 +10,7 @@
 
 #define BUF_SIZE 100
 #define NAME_SIZE 20
-#define MAX_CLIENTS 10
+#define MAX_CLIENTS 11
 #define CERT_FILE "server.crt"
 #define KEY_FILE "server.key"
 
@@ -21,19 +21,22 @@ typedef struct {
 
 ClientInfo clients[MAX_CLIENTS];
 pthread_mutex_t mutex;
+int client_cnt = 0;
 
 void *handle_client(void *arg);
 void send_to_all(char *message, int sender_index);
 void error_handling(char *msg);
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) 
+{
     SSL_CTX *ctx;
     SSL *ssl;
     int serv_sock, clnt_sock;
     struct sockaddr_in serv_addr, clnt_addr;
     socklen_t clnt_addr_size;
 
-    if (argc != 2) {
+    if (argc != 2) 
+	{
         printf("Usage : %s <port>\n", argv[0]);
         exit(1);
     }
@@ -44,7 +47,7 @@ int main(int argc, char *argv[]) {
     ctx = SSL_CTX_new(SSLv23_server_method());
     if (ctx == NULL)
         error_handling("SSL_CTX_new() error");
-		
+
 	// 인증서와 개인 키 로딩
     if (SSL_CTX_use_certificate_file(ctx, CERT_FILE, SSL_FILETYPE_PEM) <= 0 ||
         SSL_CTX_use_PrivateKey_file(ctx, KEY_FILE, SSL_FILETYPE_PEM) <= 0)
@@ -67,9 +70,11 @@ int main(int argc, char *argv[]) {
 
     clnt_addr_size = sizeof(clnt_addr);
 
-    while (1) {
+    while (1) 
+	{
         int clnt_sock = accept(serv_sock, (struct sockaddr*)&clnt_addr, &clnt_addr_size);
-        if (clnt_sock == -1) {
+        if (clnt_sock == -1) 
+		{
             perror("accept() error");
             continue;
         }
@@ -77,30 +82,27 @@ int main(int argc, char *argv[]) {
         SSL *ssl = SSL_new(ctx);
         SSL_set_fd(ssl, clnt_sock);
 
-        if (SSL_accept(ssl) == -1) {
+        if (SSL_accept(ssl) == -1) 
+		{
             close(clnt_sock);
             SSL_free(ssl);
             continue;
         }
 
-        // 클라이언트 정보를 담은 구조체를 생성하고 스레드를 시작
+        // 클라이언트 정보 구조체를 생성하고 스레드를 시작
         ClientInfo *client_info = (ClientInfo *)malloc(sizeof(ClientInfo));
         client_info->clnt_sock = clnt_sock;
         client_info->ssl = ssl;
 
-        // 뮤텍스를 사용하여 배열에 클라이언트 정보를 안전하게 추가
+        // 배열에 클라이언트 정보를 안전하게 추가
         pthread_mutex_lock(&mutex);
-        for (int i = 0; i < MAX_CLIENTS; ++i) {
-            if (clients[i].clnt_sock == 0) {
-                clients[i] = *client_info;
-                break;
-            }
-        }
+		if (client_cnt < MAX_CLIENTS - 1)
+			clients[client_cnt++] = *client_info;
         pthread_mutex_unlock(&mutex);
 
         pthread_t client_thread;
         pthread_create(&client_thread, NULL, handle_client, (void *)client_info);
-        pthread_detach(client_thread);  // 스레드가 종료되면 자원이 자동으로 해제되도록 설정
+        pthread_detach(client_thread);  // 스레드가 종료 시 자동으로 해제
     }
 
     // SSL 및 서버 소켓 종료
@@ -110,14 +112,16 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void error_handling(char *msg) {
+void error_handling(char *msg) 
+{
     fputs(msg, stderr);
     fputc('\n', stderr);
     ERR_print_errors_fp(stderr);
     exit(1);
 }
 
-void *handle_client(void *arg) {
+void *handle_client(void *arg) 
+{
     ClientInfo *client_info = (ClientInfo *)arg;
     int clnt_sock = client_info->clnt_sock;
     SSL *ssl = client_info->ssl;
@@ -125,57 +129,41 @@ void *handle_client(void *arg) {
     char name_msg[BUF_SIZE];
     char name[NAME_SIZE];
 
-    // 클라이언트의 이름을 읽음
-    if (SSL_read(ssl, name, sizeof(name) - 1) <= 0) {
-        perror("Reading name failed");
-        return NULL;
-    }
-    name[strlen(name)] = 0;
-
-    sprintf(name_msg, "[%s] has joined.\n", name);
-    send_to_all(name_msg, -1);
-
-    while (1) {
-        int str_len = SSL_read(ssl, name_msg, sizeof(name_msg) - 1);
-        if (str_len <= 0) {
-            break;
-        }
-
-        name_msg[str_len] = 0;
-
-        // 클라이언트의 메시지를 모든 클라이언트에게 전송
-        send_to_all(name_msg, clnt_sock);
-    }
-
-    // 클라이언트가 나갔음을 알림
-    sprintf(name_msg, "[%s] has left.\n", name);
-    send_to_all(name_msg, -1);
+	int str_len = 0, i;
+	while ((str_len = SSL_read(ssl, name_msg, sizeof(name_msg) - 1)) != 0)
+		send_to_all(name_msg, clnt_sock);
 
     // 해당 클라이언트의 정보를 초기화하고 소켓 및 SSL 자원을 해제
     pthread_mutex_lock(&mutex);
-    for (int i = 0; i < MAX_CLIENTS; ++i) {
-        if (clients[i].clnt_sock == clnt_sock) {
-            clients[i].clnt_sock = 0;
-            break;
-        }
-    }
+	for (i = 0; i < client_cnt; i++)   // remove disconnected client
+	{
+		if (clnt_sock == clients[i].clnt_sock)
+		{
+			while (i < client_cnt - 1)
+			{
+				clients[i] = clients[i + 1];
+				i++;
+			}
+			break;
+		}
+	}
+	client_cnt--;
     pthread_mutex_unlock(&mutex);
 
     SSL_shutdown(ssl);
     SSL_free(ssl);
     close(clnt_sock);
-
-    free(client_info);  // 클라이언트 정보를 담은 구조체를 해제
+    // 클라이언트 정보를 담은 구조체를 해제
+    free(client_info);  
 
     return NULL;
 }
 
-void send_to_all(char *message, int sender_index) {
+void send_to_all(char *message, int sender_self_index) 
+{
     pthread_mutex_lock(&mutex);
-    for (int i = 0; i < MAX_CLIENTS; ++i) {
-        if (clients[i].clnt_sock != 0 && i != sender_index) {
+    for (int i = 0; i < client_cnt; ++i)
+        if (clients[i].clnt_sock != 0 && clients[i].clnt_sock != sender_self_index)
             SSL_write(clients[i].ssl, message, strlen(message));
-        }
-    }
     pthread_mutex_unlock(&mutex);
 }
