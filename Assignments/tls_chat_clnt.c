@@ -21,6 +21,7 @@ int sock;
 
 void *send_msg(void *arg);
 void *recv_msg();
+void send_file(const char *arg);
 
 int main(int argc, char *argv[]) 
 {
@@ -73,12 +74,22 @@ int main(int argc, char *argv[])
 void *send_msg(void *arg) 
 {
     char name_msg[NAME_SIZE + BUF_SIZE];
+	char cmd = "file_share:";
     while (1)
 	{
         fgets(msg, BUF_SIZE, stdin);
-        if (!strcmp(msg, "q\n") || !strcmp(msg, "Q\n")) 
+		printf("%s", msg);
+		if (strncmp(name_msg, cmd, strlen(cmd)) == 0) 
+        {
+            // 파일 이름 추출
+            char *file_name = name_msg + strlen(cmd);
+            // 파일 전송 함수 호출
+			printf("%s", file_name);
+            send_file(file_name);
+        }
+        else if (!strcmp(msg, "q\n") || !strcmp(msg, "Q\n")) 
 		{
-			return NULL;
+			// return NULL;
             close(sock);
             SSL_free(ssl);
             SSL_CTX_free(ctx);
@@ -109,6 +120,37 @@ void *recv_msg()
     }
     return NULL;
 }
+
+void send_file(const char *file_name) 
+{
+    FILE *file = fopen(file_name, "rb");
+    if (file == NULL) 
+    {
+        fprintf(stderr, "Error opening file: %s\n", file_name);
+        return;
+    }
+    // 파일 크기 확인
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    // 파일 내용 읽기
+    char *file_buffer = (char *)malloc(file_size);
+    fread(file_buffer, 1, file_size, file);
+
+    // 파일 이름과 크기를 서버로 전송
+    char file_info[BUF_SIZE];
+    snprintf(file_info, sizeof(file_info), "file_share:%s(%ld)", file_name, file_size);
+    if (SSL_write(ssl, file_info, strlen(file_info)) <= 0)
+        error_handling("SSL_write() error");
+    // 파일 내용을 서버로 전송
+    if (SSL_write(ssl, file_buffer, file_size) <= 0)
+        error_handling("SSL_write() error");
+
+    // 메모리와 파일 자원 해제
+    free(file_buffer);
+    fclose(file);
+}
+
 
 void error_handling(char *msg) 
 {

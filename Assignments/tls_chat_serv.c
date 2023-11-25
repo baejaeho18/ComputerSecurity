@@ -10,7 +10,7 @@
 
 #define BUF_SIZE 100
 #define NAME_SIZE 20
-#define MAX_CLIENTS 11
+#define MAX_CLIENTS 3
 #define CERT_FILE "server.crt"
 #define KEY_FILE "server.key"
 
@@ -24,7 +24,8 @@ pthread_mutex_t mutex;
 int client_cnt = 0;
 
 void *handle_client(void *arg);
-void send_to_all(char *message, int sender_index);
+void send_to_all(char *msg, int sender_index);
+void send_file_to_all(const char *file_msg, int sender_self_index);
 void error_handling(char *msg);
 
 int main(int argc, char *argv[]) 
@@ -96,7 +97,7 @@ int main(int argc, char *argv[])
 
         // 배열에 클라이언트 정보를 안전하게 추가
         pthread_mutex_lock(&mutex);
-		if (client_cnt < MAX_CLIENTS - 1)
+		if (client_cnt < MAX_CLIENTS)
 			clients[client_cnt++] = *client_info;
         pthread_mutex_unlock(&mutex);
 
@@ -112,26 +113,21 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void error_handling(char *msg) 
-{
-    fputs(msg, stderr);
-    fputc('\n', stderr);
-    ERR_print_errors_fp(stderr);
-    exit(1);
-}
-
 void *handle_client(void *arg) 
 {
     ClientInfo *client_info = (ClientInfo *)arg;
     int clnt_sock = client_info->clnt_sock;
     SSL *ssl = client_info->ssl;
-
-    char name_msg[BUF_SIZE];
-    char name[NAME_SIZE];
+    char client_msg[BUF_SIZE];
 
 	int str_len = 0, i;
-	while ((str_len = SSL_read(ssl, name_msg, sizeof(name_msg) - 1)) != 0)
-		send_to_all(name_msg, clnt_sock);
+	while ((str_len = SSL_read(ssl, client_msg, sizeof(client_msg) - 1)) != 0)
+	{
+		if (strncmp(client_msg, "file_share:", 11) == 0)
+			send_file_to_all(client_msg, clnt_sock);
+		else
+			send_to_all(client_msg, clnt_sock);
+	}
 
     // 해당 클라이언트의 정보를 초기화하고 소켓 및 SSL 자원을 해제
     pthread_mutex_lock(&mutex);
@@ -166,4 +162,45 @@ void send_to_all(char *message, int sender_self_index)
         if (clients[i].clnt_sock != 0 && clients[i].clnt_sock != sender_self_index)
             SSL_write(clients[i].ssl, message, strlen(message));
     pthread_mutex_unlock(&mutex);
+}
+
+void send_file_to_all(const char *file_msg, int sender_self_index) 
+{
+    // 파일 정보에서 파일 이름과 크기 추출
+    char file_name[NAME_SIZE];
+    long file_size;
+    sscanf(file_msg + 11, "%s(%ld)", file_name, &file_size);
+
+    // 파일 데이터 수신
+    char file_buffer[file_size];
+	for (int i = 0; i < client_cnt; ++i)
+        if (clients[i].clnt_sock == sender_self_index)
+            if (SSL_read(clients[i].ssl, file_buffer, file_size) <= 0)
+        		error_handling("SSL_read() error");
+
+    // 파일 저장 (예: 현재 디렉터리에 저장)
+    FILE *file = fopen(file_name, "wb");
+    if (file == NULL) 
+    {
+        fprintf(stderr, "Error opening file for writing: %s\n", file_name);
+        return;
+    }
+    fwrite(file_buffer, 1, file_size, file);
+    fclose(file);
+
+    // 파일 수신 완료 메시지 또는 다른 클라이언트들에게 파일 전송 메시지 전송 등의 추가 로직 수행
+    printf("File received");
+
+    // 모든 클라이언트에게 파일 전송 메시지 전송
+    char broadcast_msg[BUF_SIZE];
+    snprintf(broadcast_msg, sizeof(broadcast_msg), "file_shared:%s", file_name);
+    send_to_all(broadcast_msg, sender_self_index);
+}
+
+void error_handling(char *msg) 
+{
+    fputs(msg, stderr);
+    fputc('\n', stderr);
+    ERR_print_errors_fp(stderr);
+    exit(1);
 }
