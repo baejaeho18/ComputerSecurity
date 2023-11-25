@@ -124,6 +124,7 @@ void *handle_client(void *arg)
 	int str_len = 0, i;
 	while ((str_len = SSL_read(ssl, client_msg, sizeof(client_msg) - 1)) != 0)
 	{
+    	client_msg[str_len] = '\0';
 		if (strncmp(client_msg, cmd, 11) == 0)
 			send_file_to_all(client_msg, clnt_sock);
 		else
@@ -191,13 +192,17 @@ void send_file_to_all(const char *file_msg, int sender_self_index)
     fwrite(file_buffer, 1, file_size, file);
     fclose(file);
 
-    // 파일 수신 완료 메시지 또는 다른 클라이언트들에게 파일 전송 메시지 전송 등의 추가 로직 수행
     printf("File received");
 
     // 모든 클라이언트에게 파일 전송 메시지 전송
     char broadcast_msg[BUF_SIZE];
-    snprintf(broadcast_msg, sizeof(broadcast_msg), "file_shared:%s", file_name);
+    snprintf(broadcast_msg, sizeof(broadcast_msg), "file_shared:%s(%ld)", file_name, file_size);
     send_to_all(broadcast_msg, sender_self_index);
+
+    //다른 클라이언트들에게 파일 전송
+	for (int i = 0; i < client_cnt; ++i)
+        if (clients[i].clnt_sock != 0 && clients[i].clnt_sock != sender_self_index)
+            SSL_write(clients[i].ssl, file_buffer, file_size);
 }
 
 void error_handling(char *msg) 

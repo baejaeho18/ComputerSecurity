@@ -18,9 +18,10 @@ SSL *ssl;
 SSL_CTX *ctx;
 int sock;
 
-void *send_msg(void *arg);
+void *send_msg();
 void *recv_msg();
-void send_file(const char *arg);
+void send_file(const char *file_name);
+void recv_file(SSL *ssl, const char *file_name, long file_size);
 
 int main(int argc, char *argv[]) 
 {
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void *send_msg(void *arg) 
+void *send_msg() 
 {
 	char msg[BUF_SIZE];
 	const char *cmd = "file_share:";
@@ -114,9 +115,21 @@ void *recv_msg()
         int str_len = SSL_read(ssl, name_msg, sizeof(name_msg) - 1);
         if (str_len <= 0)
             error_handling("SSL_read() error");
-
         name_msg[str_len] = 0;
-        fputs(name_msg, stdout);
+
+        if (strncmp(name_msg, "file_share:", 11) == 0) 
+        {
+            // 파일 이름 및 크기 추출
+            char *file_info = name_msg + 11;
+            char file_name[FILE_NAME_SIZE];
+            long file_size;
+            sscanf(file_info, "%s(%ld)", file_name, &file_size);
+
+            // 파일 수신을 위한 처리 함수 호출
+            recv_file(ssl, file_name, file_size);
+        }
+
+    	fputs(name_msg, stdout);
     }
     return NULL;
 }
@@ -151,6 +164,35 @@ void send_file(const char *file_name)
     fclose(file);
 }
 
+void recv_file(SSL *ssl, const char *file_name, long file_size) 
+{
+    FILE *file = fopen(file_name, "wb");
+    if (file == NULL) 
+    {
+        fprintf(stderr, "Error opening file for writing: %s\n", file_name);
+        return;
+    }
+
+    char file_buffer[BUF_SIZE];
+    long total_received = 0;
+
+    // 파일 데이터를 수신하고 파일에 쓰기
+    while (total_received < file_size) 
+    {
+        int bytes_received = SSL_read(ssl, file_buffer, sizeof(file_buffer));
+        if (bytes_received <= 0) 
+        {
+            error_handling("Error receiving file data");
+            break;
+        }
+
+        fwrite(file_buffer, 1, bytes_received, file);
+        total_received += bytes_received;
+    }
+
+    fclose(file);
+    printf("File_shared: %s\n", file_name);
+}
 
 void error_handling(char *msg) 
 {
