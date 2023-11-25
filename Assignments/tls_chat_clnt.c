@@ -118,7 +118,7 @@ void *recv_msg()
             error_handling("SSL_read() error");
         name_msg[str_len] = 0;
 
-        if (strncmp(name_msg, "file_share:", 11) == 0) 
+        if (strncmp(name_msg, "file_shared:", 12) == 0) 
         {
             // 파일 이름 및 크기 추출
             char *file_info = name_msg + 11;

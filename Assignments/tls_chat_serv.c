@@ -204,6 +204,11 @@ void send_file_to_all(const char *file_msg, int sender_self_index)
 	for (int i = 0; i < client_cnt; ++i)
         if (clients[i].clnt_sock != 0 && clients[i].clnt_sock != sender_self_index)
             SSL_write(clients[i].ssl, file_buffer, file_size);
+
+	
+    char broadcast_msg[BUF_SIZE];
+    snprintf(broadcast_msg, sizeof(broadcast_msg), "file_share end");
+    send_to_all(broadcast_msg, sender_self_index);
 }
 
 void error_handling(char *msg) 
