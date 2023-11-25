@@ -119,11 +119,12 @@ void *handle_client(void *arg)
     int clnt_sock = client_info->clnt_sock;
     SSL *ssl = client_info->ssl;
     char client_msg[BUF_SIZE];
+	const char *cmd = "file_share:";
 
 	int str_len = 0, i;
 	while ((str_len = SSL_read(ssl, client_msg, sizeof(client_msg) - 1)) != 0)
 	{
-		if (strncmp(client_msg, "file_share:", 11) == 0)
+		if (strncmp(client_msg, cmd, 11) == 0)
 			send_file_to_all(client_msg, clnt_sock);
 		else
 			send_to_all(client_msg, clnt_sock);
@@ -157,6 +158,7 @@ void *handle_client(void *arg)
 
 void send_to_all(char *message, int sender_self_index) 
 {
+	message[strlen(message)] = '\0';
     pthread_mutex_lock(&mutex);
     for (int i = 0; i < client_cnt; ++i)
         if (clients[i].clnt_sock != 0 && clients[i].clnt_sock != sender_self_index)
@@ -171,6 +173,7 @@ void send_file_to_all(const char *file_msg, int sender_self_index)
     long file_size;
     sscanf(file_msg + 11, "%s(%ld)", file_name, &file_size);
 
+	printf("%s", file_name);
     // 파일 데이터 수신
     char file_buffer[file_size];
 	for (int i = 0; i < client_cnt; ++i)

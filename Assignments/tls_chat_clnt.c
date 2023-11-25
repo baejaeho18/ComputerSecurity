@@ -14,7 +14,6 @@
 void error_handling(char *msg);
 
 char name[NAME_SIZE] = "[DEFAULT]";
-char msg[BUF_SIZE];
 SSL *ssl;
 SSL_CTX *ctx;
 int sock;
@@ -73,18 +72,17 @@ int main(int argc, char *argv[])
 
 void *send_msg(void *arg) 
 {
-    char name_msg[NAME_SIZE + BUF_SIZE];
-	char cmd = "file_share:";
+	char msg[BUF_SIZE];
+	const char *cmd = "file_share:";
     while (1)
 	{
         fgets(msg, BUF_SIZE, stdin);
-		printf("%s", msg);
-		if (strncmp(name_msg, cmd, strlen(cmd)) == 0) 
+		// printf("%s", msg);
+		if (strncmp(msg, cmd, strlen(cmd)) == 0) 
         {
             // 파일 이름 추출
-            char *file_name = name_msg + strlen(cmd);
+            char *file_name = msg + strlen(cmd);
             // 파일 전송 함수 호출
-			printf("%s", file_name);
             send_file(file_name);
         }
         else if (!strcmp(msg, "q\n") || !strcmp(msg, "Q\n")) 
@@ -95,12 +93,14 @@ void *send_msg(void *arg)
             SSL_CTX_free(ctx);
             exit(0);
         }
-
-        sprintf(name_msg, "%s %s", name, msg);
-
-        // TLS로 암호화된 데이터 전송
-        if (SSL_write(ssl, name_msg, strlen(name_msg)) <= 0)
-            error_handling("SSL_write() error");
+		else
+		{
+    		char name_msg[NAME_SIZE + BUF_SIZE];
+        	sprintf(name_msg, "%s %s", name, msg);
+			// TLS로 암호화된 데이터 전송
+			if (SSL_write(ssl, name_msg, strlen(name_msg)) <= 0)
+				error_handling("SSL_write() error");
+		}
     }
     return NULL;
 }
