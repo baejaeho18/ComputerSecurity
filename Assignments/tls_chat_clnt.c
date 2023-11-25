@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 	if (argc != 4) {
 		printf("Usage : %s <IP> <port> <name>\n", argv[0]);
 		exit(1);
-	 }
+	}
 	
 	sprintf(name, "[%s]", argv[3]);
 	sock = socket(PF_INET, SOCK_STREAM, 0);
