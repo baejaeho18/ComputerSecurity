@@ -27,8 +27,22 @@ In response to Man-in-the-Middle attack(creates z) <br>
 
 ## Pulic Key
 ### Public Key Distribution
+Just announce the public key is subject to forgery <br>
+=> Controlled Trusted Center (with signature) <br>
+=> CA(Certification Authority) : "I, the CA, guarantee that 48924579 is A's public key" <br>
+<img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/bbd5d1ac-8de9-4015-8f06-d9d59a373c25">
+
 ### Public Key Certificate(PKC)
+Digital Certificate binds a user with its public key signed by a CA <br>
+X.509 standard : User, Validity, Public key... <br>
+<img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/675e8f95-e140-4d47-97eb-86691e7f2859">
+
 ### Public Key Infrastructure (PKI)
+<img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/7fb4acbc-067e-487c-b2e6-4107815aaf8f"> <br>
+RA got requests, CA generates certificates, server stores private keys and directory stores certificates <br>
+Key generation -> Registration -> Verification -> Certificate creation <br>
+
+OCSP (Online Certificate Status Protocol) : 
 
 # Ch6. Internet Security Protocols
 ## Internet Security Approach
