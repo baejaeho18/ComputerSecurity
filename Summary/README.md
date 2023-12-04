@@ -93,6 +93,7 @@ Connfidentiality, message Integrity, Authentication <br>
 3) Encrpyt both message and signature (using session key)
 4) Attach RSA/ElGamal encrpyted session key (using receiver's public key) <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/62bd7e0e-adde-43af-8108-ca9fb634cb7c">
+
 ### Secure/Multipurpose Internet Mail Extensions(S/MIME)
 S/MIME(Secure/Multipurpose Internet Mail Extensions) provide support for varying content types and security enhancements <br>
 Functions:
@@ -118,14 +119,13 @@ Clear PW -> Message Digests of PW -> One-Time PW
 Rules:
    - Token and server are synchronized initially
    - Token generates fresh passwords periodically
-
 **Zero-Knkowledge Proof** : The claimant proves to the verifier that he knows a secret wihtout revealing it
 - Fiat-Shamir Protocol
-
 ### Certificate based authentication
-Based on PLI, CA proves authentication
+Based on PKI, CA proves authentication
 ### Biometric Authentication
 <img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/322e695e-0387-4f36-97a4-d516468cdcda"> <br>
+
 ~~### Kerberos~~
 
 # Ch9. Network Security
@@ -161,10 +161,8 @@ IPSec is a general IP security mechanisms. It provides authentication, confident
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/ab7e3b68-ff97-48ea-839e-74012a58202b"> <br>
 
 ### IPSec Process
-SA(Security Association)
-SAD : how to do it <br>
-SP(Seucrity Policy)
-SPD : what to do it(drop, bypass, apply) <br>
+SA(Security Association), SAD : how to do it <br>
+SP(Seucrity Policy), SPD : what to do it(drop, bypass, apply) <br>
 <img width="919" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/9b0be814-8351-4bd8-9942-750fc6115804">
 
 ### Virtual Private Network
