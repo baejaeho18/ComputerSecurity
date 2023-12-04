@@ -5,7 +5,6 @@ cons : Need to share secret key : $\frac{n(n-1)}{2}$ <br>
 1) Number of Keys
 2) How to distribute the keys? <br>
 => Solution : Use a trusted third party <br>
-
 ### Symmetric Key Distribuiton
 <img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/9ab13145-640e-4d09-a71b-e164840520b4"> <br>
 Multiple KDC(Key-Distribution Center) and each memebers establish a secret key <br>
@@ -16,7 +15,6 @@ A request to KDC and KDC give what to send to Bob <br>
 - Otway-Rees Protocol <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/ae058dd2-24b8-4052-8715-d50446f4bf3f"> <br>
 A suggest to B and B request session key to KDC <br>
-
 ### Symmetric Key Agreement
 Create a session key between themselves without using KDC <br>
 => **Diffle-Hellman Protocol** <br>
@@ -44,7 +42,7 @@ OCSP (Online Certificate Status Protocol) :
 
 # Ch6. Internet Security Protocols
 ## Internet Security Approach
-TCP/IP Protocol : Application > Transport > Network > Link > Physics Layers
+TCP/IP Protocol : Application > Transport > Network > Link > Physics Layers <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/bf77b896-3549-4525-acab-96abe0dda50f">
 
 ## Basic of SSL
@@ -53,7 +51,6 @@ SSL(Secure Socket Layer)) is a **Transport layer** security service which encrpy
 - Connection : peer-to-peer
 
 Following four SSL Protocols are used
-
 ### SSL Handshake Protocol
 Allow the server and client to **authenticate** each other <br>
 <img width="800" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/2873f947-790a-40b1-aa78-58e5e2ad859c">
@@ -63,29 +60,48 @@ Allow the server and client to **authenticate** each other <br>
 2) Client validate CA using CA's public key <br>
    -> open server's public key
 3) Client send Pre-master key to Server <br>
-   -> create master key both
+   -> create master key both <br>
 <img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/594f89ff-3c0e-4474-ba0b-bd3c44b594ef"> <br>
    -> create session key both
 4) Handshake done <- SSL ChangeCipherSpec Protocol
-
 ### SSL Record Protocol
-For **Confidentiality**(encrpyt by shared secret key) and **Message Integrity**(generate MAC)
+For **Confidentiality**(encrpyt by shared secret key) and **Message Integrity**(generate MAC) <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/c19848d6-b634-4a54-8118-3c907907e2a9"> <br>
-MAC = hash(MAC_write_secret, pads, seq_num, etc)
+MAC = hash(MAC_write_secret, pads, seq_num, etc) <br>
 Header : Content Type(handshake/alert/change cipher), versions(3.1 -> 3, 1), compression length
-
 ### SSL ChangeChiperSpec Protocol
-A single byte message(0x01) to sign the completeness of updating SSL parameters
+A single byte message(0x01) to inform the completeness of updating SSL parameters <br>
 <img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/33b97c4e-174d-448a-858a-a4e264f5c278">
-
 ### SSL Alert Protocol
-To warning or fatal
+To warning or fatal <br>
 <img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/264972fa-0e25-4a3f-b6f9-071a460e37de">
 
-## Email & Set
+## Email ~~& Set~~
+ Components
+- user agent : mail reader using e-mail access protocol(POP3, IMAP, HTTP)
+- mail server(receiver&sender) : mailbox(incoming), message queue(outgoing)
+- SMTP(Simple Mail Transfer Protocol) : between mail servers(port 25) <br>
+<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/7b5d06a5-ed8a-49cd-8d37-4c07a0343c4f"> <br>
 ### Email Review and Secure Email
+Connfidentiality, message Integrity, Authentication <br>
+ => Use three Keys : Alice's private key, Bob's public key, new symmetric key <br>
+<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/8b5e73a0-d93c-4fe3-a8b8-8efb56f90f1a"> <br>
 ### Pretty Good Privacy(PGP)
+<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/e44e4e40-f658-4931-a78b-3406043ae309"> <br>
+1) Create signature(using sender's private key) and attach to message
+2) Compression
+3) Encrpyt both message and signature (using session key)
+4) Attach RSA/ElGamal encrpyted session key (using receiver's public key) <br>
+<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/0f134cb1-9783-40b0-9349-b17cd353b021">
+
 ### Secure/Multipurpose Internet Mail Extensions(S/MIME)
+S/MIME(Secure/Multipurpose Internet Mail Extensions) provide support for varying content types and security enhancements <br>
+Functions:
+- Enveloped data : encrpyt message with receiver's public key
+- Signed data : encrpyted message and its sign
+- Clear-signed data : clear message and its sign
+- Signed & enveloped data : message and its sign both encrypted
+
 ~~### Secure Electronic Transaction (SET)~~
 
 # Ch7.User Authentication Mechanisms
