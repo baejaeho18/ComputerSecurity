@@ -1,5 +1,5 @@
 # Ch5. Public Key Infrastructure(PKI)
-## Symmetric Key
+## 5.1 Symmetric Key
 pros : Effective when enciphering large message <br>
 cons : Need to share secret key : $\frac{n(n-1)}{2}$ <br>
 1) Number of Keys
@@ -11,10 +11,10 @@ Multiple KDC(Key-Distribution Center) and each memebers establish a secret key <
 A temporary session symmetric key is created by KDC using two member's secret key <br>
 - Needham-Schroeder Protocol <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/243dc28f-1637-4208-8a33-09c61d6887c2"> <br>
-A request to KDC and KDC give what to send to Bob <br>
+Alice request to KDC and KDC give what to send to Bob <br>
 - Otway-Rees Protocol <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/ae058dd2-24b8-4052-8715-d50446f4bf3f"> <br>
-A suggest to B and B request session key to KDC <br>
+Alice suggest to Bob and Bob request session key to KDC <br>
 ### Symmetric Key Agreement
 Create a session key between themselves without using KDC <br>
 => **Diffle-Hellman Protocol** <br>
@@ -23,7 +23,7 @@ In response to Man-in-the-Middle attack(creates z) <br>
 <img width="300" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/3c7d6d81-a814-4bcc-b46f-72012384c1b4"> <br>
 => Station-to-Station Protocol : Add digital signatures
 
-## Pulic Key
+## 5.2 Pulic Key
 ### Public Key Distribution
 Just announce the public key is subject to forgery <br>
 => Controlled Trusted Center (with signature) <br>
@@ -41,11 +41,11 @@ Key generation -> Registration -> Verification -> Certificate creation <br>
 OCSP (Online Certificate Status Protocol) : 
 
 # Ch6. Internet Security Protocols
-## Internet Security Approach
+## 6.1 Internet Security Approach
 TCP/IP Protocol : Application > Transport > Network > Link > Physics Layers <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/bf77b896-3549-4525-acab-96abe0dda50f">
 
-## Basic of SSL
+## 6.2 Basic of SSL
 SSL(Secure Socket Layer)) is a **Transport layer** security service which encrpyts and also authenticates. It becames TLS(Transport Layer Security)
 - Session : client-server like
 - Connection : peer-to-peer
@@ -76,7 +76,7 @@ A single byte message(0x01) to inform the completeness of updating SSL parameter
 To warning or fatal <br>
 <img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/264972fa-0e25-4a3f-b6f9-071a460e37de">
 
-## Email ~~& Set~~
+## 6.3 Email ~~& Set~~
  Components
 - user agent : mail reader using e-mail access protocol(POP3, IMAP, HTTP)
 - mail server(receiver&sender) : mailbox(incoming), message queue(outgoing)
@@ -118,7 +118,7 @@ Clear PW -> Message Digests of PW -> One-Time PW
 ### Authentication Token
 Rules:
    - Token and server are synchronized initially
-   - Token generates fresh passwords periodically
+   - Token generates fresh passwords periodically <br>
 **Zero-Knkowledge Proof** : The claimant proves to the verifier that he knows a secret wihtout revealing it
 - Fiat-Shamir Protocol
 ### Certificate based authentication
@@ -129,7 +129,7 @@ Based on PKI, CA proves authentication
 ~~### Kerberos~~
 
 # Ch9. Network Security
-## Introduction of Firewalls
+## 9.1 Introduction of Firewalls
 Firewall is a special type of network router. It controls transmission between internal and external networks.
 ### Types of Firewalls
 <img width="900" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/75ec944c-ceef-4333-b8e7-efcc83e47699"> <br>
@@ -139,13 +139,12 @@ Firewall is a special type of network router. It controls transmission between i
 - Application Gateway(proxy server) : Block packets based on the contents of messages
    - additional overhead needed
 ### Firewall Configurations
-<img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/a7b482d6-c460-4c15-8abd-7bff18b59177"> 
-
+<img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/a7b482d6-c460-4c15-8abd-7bff18b59177"> <br>
 ### Demilitarized Zone Networks
 DMZ is simply a network segment that is located between the protected and the unprotected networks
 ### Limitations of Firewall
 
-## IPSec Overview
+## 9.2 IPSec Overview
 IPSec is a general IP security mechanisms. It provides authentication, confidentiality, key management <br>
 <img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/ba71fa9d-379b-4e11-8063-c0640bfb8190"><br>
 ### IPSec Operation Modes
@@ -155,9 +154,9 @@ IPSec is a general IP security mechanisms. It provides authentication, confident
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/91ed1b14-1200-4628-a146-75e3595f7d8d"> 
   
 ### IPSec Security Protocols
-- AH(Authentication Header) : provide **authentication and data integrity**
+- AH(Authentication Header) : provide **authentication** and **data integrity**
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/867c9e7d-8814-48d5-8dc0-98459498056c"> <br>
-- ESP(Encapsulationg Security Payload) : provide authentication and data integrity **and privacy(encrpytion)**
+- ESP(Encapsulationg Security Payload) : provide authentication and data integrity and **privacy(encrpytion)**
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/ab7e3b68-ff97-48ea-839e-74012a58202b"> <br>
 
 ### IPSec Process
