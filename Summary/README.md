@@ -92,7 +92,8 @@ Connfidentiality, message Integrity, Authentication <br>
 2) Compression
 3) Encrpyt both message and signature (using session key)
 4) Attach RSA/ElGamal encrpyted session key (using receiver's public key) <br>
-<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/0f134cb1-9783-40b0-9349-b17cd353b021">
+<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/62bd7e0e-adde-43af-8108-ca9fb634cb7c">
+
 
 ### Secure/Multipurpose Internet Mail Extensions(S/MIME)
 S/MIME(Secure/Multipurpose Internet Mail Extensions) provide support for varying content types and security enhancements <br>
@@ -105,11 +106,27 @@ Functions:
 ~~### Secure Electronic Transaction (SET)~~
 
 # Ch7.User Authentication Mechanisms
+Authentication : "The process by which the identity of someone or something gets established"
+- Verification : "Is the claimant the person who he or she claims to be?" : one-to-one
+- Identfification : "Is the claimant an erolled user and who is he/she?" : one-to-many
 ### Password based Authentication
+Possilbe attack : Replay attack, Password-Guessing attack, ... <br>
+Protecting PW files : Hashing and Salting <br>
+<img width="688" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/fc78e01d-bfc0-42d6-94c5-719310e307cf"> <br>
+Clear PW -> Message Digests of PW -> One-Time PW(Lamport one-time password : $h^{n}(x)=h(h^{n-1}(x))$)
 ### Authentication Token
+Rules:
+   - Token and server are synchronized initially
+   - Token generates fresh passwords periodically
+
+**Zero-Knkowledge Proof** : The claimant proves to the verifier that he knows a secret wihtout revealing it
+- Fiat-Shamir Protocol
+
 ### Certificate based authentication
+Based on PLI, CA proves authentication
 ### Biometric Authentication
-### Kerberos
+<img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/322e695e-0387-4f36-97a4-d516468cdcda">
+~~### Kerberos~~
 
 # Ch9. Network Security
 ## Introduction of Firewalls
