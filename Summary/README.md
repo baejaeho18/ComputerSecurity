@@ -44,15 +44,49 @@ OCSP (Online Certificate Status Protocol) :
 
 # Ch6. Internet Security Protocols
 ## Internet Security Approach
+TCP/IP Protocol : Application > Transport > Network > Link > Physics Layers
+<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/bf77b896-3549-4525-acab-96abe0dda50f">
+
 ## Basic of SSL
+SSL(Secure Socket Layer)) is a **Transport layer** security service which encrpyts and also authenticates. It becames TLS(Transport Layer Security)
+- Session : client-server like
+- Connection : peer-to-peer
+
+Following four SSL Protocols are used
+
 ### SSL Handshake Protocol
+Allow the server and client to **authenticate** each other <br>
+<img width="800" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/2873f947-790a-40b1-aa78-58e5e2ad859c">
+1) Establish Securit Capabilities
+   - Client Hello (nonce, cipher suite, session_id)
+   - Server Hello (nonce, cipher, CA)
+2) Client validate CA using CA's public key <br>
+   -> open server's public key
+3) Client send Pre-master key to Server <br>
+   -> create master key both
+<img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/594f89ff-3c0e-4474-ba0b-bd3c44b594ef"> <br>
+   -> create session key both
+4) Handshake done <- SSL ChangeCipherSpec Protocol
+
 ### SSL Record Protocol
-### SSL Change Chiper Spec Protocol and Alert Protocol
+For **Confidentiality**(encrpyt by shared secret key) and **Message Integrity**(generate MAC)
+<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/c19848d6-b634-4a54-8118-3c907907e2a9"> <br>
+MAC = hash(MAC_write_secret, pads, seq_num, etc)
+Header : Content Type(handshake/alert/change cipher), versions(3.1 -> 3, 1), compression length
+
+### SSL ChangeChiperSpec Protocol
+A single byte message(0x01) to sign the completeness of updating SSL parameters
+<img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/33b97c4e-174d-448a-858a-a4e264f5c278">
+
+### SSL Alert Protocol
+To warning or fatal
+<img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/264972fa-0e25-4a3f-b6f9-071a460e37de">
+
 ## Email & Set
 ### Email Review and Secure Email
 ### Pretty Good Privacy(PGP)
 ### Secure/Multipurpose Internet Mail Extensions(S/MIME)
-### Secure Electronic Transaction (SET)
+~~### Secure Electronic Transaction (SET)~~
 
 # Ch7.User Authentication Mechanisms
 ### Password based Authentication
