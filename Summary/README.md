@@ -93,8 +93,6 @@ Connfidentiality, message Integrity, Authentication <br>
 3) Encrpyt both message and signature (using session key)
 4) Attach RSA/ElGamal encrpyted session key (using receiver's public key) <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/62bd7e0e-adde-43af-8108-ca9fb634cb7c">
-
-
 ### Secure/Multipurpose Internet Mail Extensions(S/MIME)
 S/MIME(Secure/Multipurpose Internet Mail Extensions) provide support for varying content types and security enhancements <br>
 Functions:
@@ -141,19 +139,20 @@ Firewall is a special type of network router. It controls transmission between i
 - Application Gateway(proxy server) : Block packets based on the contents of messages
    - additional overhead needed
 ### Firewall Configurations
-<img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/a7b482d6-c460-4c15-8abd-7bff18b59177"> <br>
+<img width="500" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/a7b482d6-c460-4c15-8abd-7bff18b59177"> 
+
 ### Demilitarized Zone Networks
 DMZ is simply a network segment that is located between the protected and the unprotected networks
 ### Limitations of Firewall
 
 ## IPSec Overview
-IPSec is a general IP security mechanisms. It provides authentication, confidentiality, key management
+IPSec is a general IP security mechanisms. It provides authentication, confidentiality, key management <br>
 <img width="400" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/ba71fa9d-379b-4e11-8063-c0640bfb8190"><br>
 ### IPSec Operation Modes
-- Trnasport Mode : between trasnport layer and network layer
+- Trnasport Mode : between trasnport layer and network layer <br>
 <img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/5a94f426-798d-4fe3-9b94-f3d624b327b9"> <br>
-- Tunnel Mode : between two network layter
-<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/91ed1b14-1200-4628-a146-75e3595f7d8d"> <br>
+- Tunnel Mode : between two network layter <br>
+<img width="600" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/91ed1b14-1200-4628-a146-75e3595f7d8d"> 
   
 ### IPSec Security Protocols
 - AH(Authentication Header) : provide **authentication and data integrity**
@@ -163,9 +162,9 @@ IPSec is a general IP security mechanisms. It provides authentication, confident
 
 ### IPSec Process
 SA(Security Association)
-SAD : how to do it
+SAD : how to do it <br>
 SP(Seucrity Policy)
-SPD : what to do it(drop, bypass, apply)
+SPD : what to do it(drop, bypass, apply) <br>
 <img width="919" alt="image" src="https://github.com/baejaeho18/ComputerSecurity/assets/37645490/9b0be814-8351-4bd8-9942-750fc6115804">
 
 ### Virtual Private Network
